@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  id         Int             @id @default(autoincrement())
+  gender     String
+  email      String
+  dob        String
+  registered String
+  phone      String
+  cell       String
+  nat        String
+  name       UserName?
+  login      UserLogin?
+  location   UserLocation?
+  picture    UserPicture?
+  identifier UserIdentifier?
+}
+
+model UserIdentifier {
+  id    Int     @id @default(autoincrement())
+  name  String
+  value String?
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
+}
+
+model UserName {
+  id     Int    @id @default(autoincrement())
+  title  String
+  first  String
+  last   String
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int    @unique
+}
+
+model UserLocation {
+  id          Int                  @id @default(autoincrement())
+  city        String
+  state       String
+  country     String
+  postcode    Int
+  coordinates LocationCoordinates?
+  timezone    LocationTimezone?
+  street      LocationStreet?
+  user        User                 @relation(fields: [userId], references: [id])
+  userId      Int                  @unique
+}
+
+model LocationStreet {
+  id             Int          @id @default(autoincrement())
+  number         Int
+  name           String
+  userLocation   UserLocation @relation(fields: [userLocationId], references: [id])
+  userLocationId Int          @unique
+}
+
+model LocationTimezone {
+  id             Int          @id @default(autoincrement())
+  offset         String
+  description    String
+  userLocation   UserLocation @relation(fields: [userLocationId], references: [id])
+  userLocationId Int          @unique
+}
+
+model LocationCoordinates {
+  id             Int          @id @default(autoincrement())
+  latitude       String
+  longitude      String
+  userLocation   UserLocation @relation(fields: [userLocationId], references: [id])
+  userLocationId Int          @unique
+}
+
+model UserLogin {
+  id       Int    @id @default(autoincrement())
+  uuid     String @unique
+  username String
+  md5      String
+  sha1     String
+  sha256   String
+  salt     String
+  password String
+  user     User   @relation(fields: [userId], references: [id])
+  userId   Int    @unique
+}
+
+model UserPicture {
+  id        Int    @id @default(autoincrement())
+  large     String
+  medium    String
+  thumbnail String
+  user      User   @relation(fields: [userId], references: [id])
+  userId    Int    @unique
+}
